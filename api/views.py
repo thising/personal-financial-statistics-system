@@ -10,7 +10,6 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import APIException
 
 from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.views import ObtainJSONWebToken
@@ -18,6 +17,13 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from .serializers import *
 from .models import *
+
+# Wechat settings
+WX_SETTINGS = {
+    'appid': 'wx-app-id',
+    'secret': 'wx-app-secret',
+    'grant_type': 'authorization_code',
+}
 
 # Create your views here.
 class WXLogin(ObtainJSONWebToken):
@@ -32,10 +38,10 @@ class WXLogin(ObtainJSONWebToken):
         wxcode = request.data.get('code', '')
         if len(wxcode) > 0:
             c2sdata = {
-                'appid': 'wx-app-id', 
-                'secret': 'wx-app-secret',
+                'appid': WX_SETTINGS['appid'], 
+                'secret': WX_SETTINGS['secret'],
                 'js_code': wxcode,
-                'grant_type': 'authorization_code'
+                'grant_type': WX_SETTINGS['grant_type']
                 }
             res = requests.get("https://api.weixin.qq.com/sns/jscode2session", params=c2sdata)
             info = json.loads(res.text)
