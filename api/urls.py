@@ -20,10 +20,8 @@ from django.conf.urls import url, include
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
-router.register(r'cards', CardViewSet)
-router.register(r'investments', InvestmentViewSet)
+router.register(r'cards', CardViewSet, basename = 'card')
+router.register(r'investments', InvestmentViewSet, basename = 'investment')
 
 urlpatterns = [
 	url(r'^', include(router.urls)),

@@ -22,7 +22,7 @@ class Investment(models.Model):
 
     name = models.CharField('名称', max_length = 10)
     source = models.CharField('渠道', choices = enum_source_type, max_length = 10, default = 'bank')
-    issue = models.DateField('购买时间', auto_now_add=True)
+    issue = models.DateField('购买时间', auto_now_add = True)
     start = models.DateField('起息日')
     finish = models.DateField('到期日')
     period = models.DurationField('周期(天)')
@@ -33,7 +33,7 @@ class Investment(models.Model):
     card = models.ForeignKey(Card, models.CASCADE)
 
     def __str__(self):
-        return self.name + '(' + self.start.strftime("%Y-%m-%d") + " --" + self.period + "--> " + self.finish.strftime("%Y-%m-%d") + ')' + self.money + '(' + self.rate1 + ')'
+        return self.name + '(' + self.start.strftime("%Y-%m-%d") + " --" + str(self.period) + "--> " + self.finish.strftime("%Y-%m-%d") + ')' + str(self.money) + '(' + str(self.rate1) + ')'
 
     class Meta:
         ordering = ["-issue"]

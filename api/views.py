@@ -4,20 +4,20 @@ import time
 import hashlib
 
 from django.shortcuts import render
+from django.contrib.auth.models import User, Group
+
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import APIException
+
 from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.views import ObtainJSONWebToken
-from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
-from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
 from .serializers import *
 from .models import *
-
-jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 # Create your views here.
 class WXLogin(ObtainJSONWebToken):
@@ -52,6 +52,9 @@ class WXLogin(ObtainJSONWebToken):
                     user = User.objects.create(username = openid)
                     user.set_password(session_key)
                 
+                jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+                jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
                 payload = jwt_payload_handler(user)
                 token = jwt_encode_handler(payload)
                 print(token)
@@ -60,34 +63,25 @@ class WXLogin(ObtainJSONWebToken):
             'token': token,
         })
 
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+wxlogin = WXLogin.as_view()
 
 class CardViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    queryset = Card.objects.all()
     serializer_class = CardSerializer
+
+    def get_queryset(self):
+        return Card.objects.filter(owner = self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner = self.request.user)
 
 class InvestmentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    queryset = Investment.objects.all()
     serializer_class = InvestmentSerializer
 
-
-wxlogin = WXLogin.as_view()
+    def get_queryset(self):
+        return Investment.objects.filter(card__owner = self.request.user)
