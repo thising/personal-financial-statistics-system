@@ -1,5 +1,5 @@
 .DS_Store
-manage/migrations/*
+*/migrations/*
 *.txt
 *.sqlite3
 *.bak

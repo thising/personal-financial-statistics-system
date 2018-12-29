@@ -20,4 +20,4 @@ class InvestmentSerializer(serializers.ModelSerializer):
     card = OwnerFilteredPrimaryKeyRelatedField(queryset = Card.objects.all())
     class Meta:
         model = Investment
-        fields = ('id', 'name', 'source', 'issue', 'start', 'finish', 'period', 'money', 'rate1', 'rate2', 'income', 'card')
+        fields = '__all__'
